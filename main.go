@@ -75,27 +75,30 @@ func main() {
 		os.Exit(0)
 	}
 
-	// mandatory should be a lower case letter
-	mandatory, ok := getMandatory(*mandatoryString)
-	check(ok)
-
-	if *size < 1 || *size > 9 || *letters == "" {
+	if *size < 1 || *size > 9 || *mandatoryString == "" || *letters == "" {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
+	// mandatory should be a lower case letter
+	mandatory, ok := getMandatory(*mandatoryString)
+	check(ok)
+
+	// open dictionary
+	file, ok := os.Open(*dictionary)
+	check(ok)
+	defer file.Close()
+
+	// if verbose show all parameters
 	if *verbose {
 		fmt.Println("dictionary:", *dictionary)
 		fmt.Println("letters:", *letters)
 		fmt.Println("mandatory:", mandatory)
 		fmt.Println("size:", *size)
-		fmt.Println("tail:", flag.Args())
+		fmt.Println("other arguments:", flag.Args())
 	}
 
-	file, ok := os.Open(*dictionary)
-	check(ok)
-	defer file.Close()
-
+	// read all words from dictionary, printing only valid words
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanWords)
 	for scanner.Scan() {
