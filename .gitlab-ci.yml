@@ -1,0 +1,26 @@
+---
+
+image: golang:alpine
+
+variables:
+  REPO_NAME: gitlab.com/fjung/previousday
+
+before_script:
+  - mkdir -p $GOPATH/src/$(dirname ${REPO_NAME})
+  - ln -svf $CI_PROJECT_DIR $GOPATH/src/${REPO_NAME}
+  - cd $GOPATH/src/${REPO_NAME}
+
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  script:
+    - if [ $(go fmt | wc -l) -ne 0 ]; then
+        echo "ERROR not formatted";
+        exit 1;
+      fi
+    - go vet -v
+    - go build
+    - go run main.go -mandatory c -letters adevcrsoi
