@@ -5,6 +5,8 @@ This is a Go lang implementation of the 9 letter word puzzle:
 * [Nine Letter Word](http://nineletterword.tompaton.com/adevcrsoi/)
 * [Your Word Life](http://www.yourwiselife.com.au/games/9-letter-word/)
 
+![nineletterword.tompaton.com](nineletterword.png)
+
 ## Example
 
 To run program:

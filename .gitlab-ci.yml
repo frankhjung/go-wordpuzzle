@@ -30,7 +30,8 @@ test:
   script:
     - go test -v
 
-deploy:
+run:
   stage: deploy
   script:
     - go run wordpuzzle.go -mandatory c -letters adevcrsoi
+    - go run wordpuzzle.go -h

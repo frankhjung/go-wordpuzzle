@@ -12,7 +12,7 @@ import (
 
 // Program version
 const (
-	USAGE = `Usage: wordpuzzle -size [num] -mandatory [char] -letters <letters> [options]
+	USAGE = `Usage: wordpuzzle -size [num] -mandatory [char] -letters [letters] [options]
 Solve 9-letter word puzzle.
 Available options:`
 	VERSION = "1.0.0"
@@ -38,16 +38,28 @@ func check(e error) {
 	}
 }
 
+// IsValidLetters returns true if string is 9 lowercase letters
+func IsValidLetters(s string) bool {
+	if len(s) != 9 {
+		return false
+	}
+	for _, c := range s {
+		if !unicode.IsLower(c) && unicode.IsLetter(c) {
+			return false
+		}
+	}
+	return true
+}
+
 // GetMandatory returns leading lowercase byte from the argument string
 func GetMandatory(s string) (byte, error) {
-	var empty byte
 	if len(s) == 1 {
 		if m := rune(s[0]); unicode.IsLower(m) {
 			return byte(m), nil
 		}
-		return empty, fmt.Errorf("expected lowercase letter got %s", s)
+		return 0, fmt.Errorf("expected lowercase letter got %s", s)
 	}
-	return empty, fmt.Errorf("%s is invalid for mandatory character", s)
+	return 0, fmt.Errorf("%s is invalid for mandatory character", s)
 }
 
 // RemoveIndex removes value by index from a byte array
@@ -84,7 +96,7 @@ func main() {
 
 	dictionaryPath := flag.String("dictionary", "dictionary", "Dictionary to read words from")
 	letters := flag.String("letters", "", "Nine letters to make words")
-	mandatoryString := flag.String("mandatory", "", "Mandatory character for all words")
+	mandatoryChar := flag.String("mandatory", "", "Mandatory character for all words")
 	size := flag.Int("size", 4, "Minimum word size (value from 1..9)")
 	verboseFlag := flag.Bool("verbose", false, "Verbose mode")
 	versionFlag := flag.Bool("version", false, "print wordpuzzle version")
@@ -92,21 +104,39 @@ func main() {
 
 	flag.Parse()
 
+	// print usage if no flags set
+	if flag.NFlag() == 0 {
+		usage()
+		os.Exit(0)
+	}
+
 	// print version then exit
 	if *versionFlag {
 		version()
 		os.Exit(0)
 	}
 
-	// test mandatory parameters
-	if *size < 1 || *size > 9 || *mandatoryString == "" || *letters == "" {
+	// test required parameter letters
+	if !IsValidLetters(*letters) {
+		fmt.Fprintf(os.Stderr, "Error: invalid letters %s\n", *letters)
 		usage()
 		os.Exit(1)
 	}
 
-	// mandatory should be a lower case letter
-	mandatory, ok := GetMandatory(*mandatoryString)
-	check(ok)
+	// test required parameter mandatory
+	mandatory, ok := GetMandatory(*mandatoryChar)
+	if ok != nil {
+		fmt.Fprintf(os.Stderr, "Error: invalid mandatory %s\n", *mandatoryChar)
+		usage()
+		os.Exit(1)
+	}
+
+	// test required parameter size
+	if *size < 1 || *size > 9 {
+		fmt.Fprintf(os.Stderr, "Error: invalid size %d\n", *size)
+		usage()
+		os.Exit(1)
+	}
 
 	// open dictionary
 	file, ok := os.Open(*dictionaryPath)
