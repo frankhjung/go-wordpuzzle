@@ -10,44 +10,49 @@ const (
 	letters   = "adevcrsoi"
 )
 
+var (
+	empty byte
+	test  string
+)
+
 func TestWordTooShort(t *testing.T) {
-	word := "ice"
-	if IsValidWord(size, mandatory, letters, word) {
-		t.Errorf("Invalid word %s. Expected false", word)
+	test = "ice"
+	if IsValidWord(size, mandatory, letters, test) {
+		t.Errorf("Invalid word %s. Expected false", test)
 	}
 }
 
 func TestWordTooLong(t *testing.T) {
-	word := "adevcrsoia"
-	if IsValidWord(size, mandatory, letters, word) {
-		t.Errorf("Invalid word %s. Expected false", word)
+	test = "adevcrsoia"
+	if IsValidWord(size, mandatory, letters, test) {
+		t.Errorf("Invalid word %s. Expected false", test)
 	}
 }
 
 func TestValidWord(t *testing.T) {
-	word := "voice"
-	if !IsValidWord(size, mandatory, letters, word) {
-		t.Errorf("Valid word %s. Expected true", word)
+	test = "voice"
+	if !IsValidWord(size, mandatory, letters, test) {
+		t.Errorf("Valid word %s. Expected true", test)
 	}
 }
 
 func TestNotValidWord(t *testing.T) {
-	word := "voicex"
-	if IsValidWord(size, mandatory, letters, word) {
-		t.Errorf("Valid word %s. Expected true", word)
+	test = "voicex"
+	if IsValidWord(size, mandatory, letters, test) {
+		t.Errorf("Valid word %s. Expected true", test)
 	}
 }
 
 func TestRemoveIndex(t *testing.T) {
-	word := []byte("abc")
-	if result := RemoveIndex(word, 0); string(result) != "bc" {
-		t.Errorf("RemoveIndex from %s. Expected 'bc' got %s", word, result)
+	test := "abc"
+	if result := RemoveIndex([]byte(test), 0); string(result) != "bc" {
+		t.Errorf("RemoveIndex from %s. Expected 'bc' got %s", test, result)
 	}
 }
 
 func TestGetMandatory(t *testing.T) {
-	parameter := "cd"
-	mandatory, ok := GetMandatory(parameter)
+	test = "c"
+	mandatory, ok := GetMandatory(test)
 	if ok != nil {
 		t.Errorf("Unexpected error: %t", ok)
 	}
@@ -56,10 +61,30 @@ func TestGetMandatory(t *testing.T) {
 	}
 }
 
+func TestGetMandatoryInvalid(t *testing.T) {
+	test = "xx"
+	mandatory, ok := GetMandatory(test)
+	if ok == nil {
+		t.Errorf("Expected error: got %v and %c", ok, mandatory)
+	}
+	if mandatory != empty {
+		t.Errorf("Expected '' got %c", mandatory)
+	}
+}
+
+func TestGetMandatoryNotLetter(t *testing.T) {
+	test = "$"
+	mandatory, ok := GetMandatory(test)
+	if ok == nil {
+		t.Errorf("Expected error: got %v and %c", ok, mandatory)
+	}
+	if mandatory != empty {
+		t.Errorf("Expected '' got %c", mandatory)
+	}
+}
 func TestGetMandatoryEmpty(t *testing.T) {
-	var parameter string
-	var empty byte
-	mandatory, ok := GetMandatory(parameter)
+	test = ""
+	mandatory, ok := GetMandatory(test)
 	if ok == nil {
 		t.Errorf("Expected error: got %v and %c", ok, mandatory)
 	}

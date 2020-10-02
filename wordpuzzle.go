@@ -10,33 +10,49 @@ import (
 	"unicode"
 )
 
-const VERSION = "1.0.0"
+// Program version
+const (
+	USAGE = `Usage: wordpuzzle -size [num] -mandatory [char] -letters <letters> [options]
+Solve 9-letter word puzzle.
+Available options:`
+	VERSION = "1.0.0"
+)
 
-// GetMandatory returns mandatory byte from command line argument string
-func GetMandatory(in string) (byte, error) {
-	var empty byte
-	if len(in) > 0 {
-		if m := rune(in[0]); unicode.IsLetter(m) && unicode.IsLower(m) {
-			return byte(m), nil
-		}
-		return empty, fmt.Errorf("expected lowercase letter got %s", in)
+// Usage prints program help
+func usage() {
+	fmt.Fprintln(os.Stderr, USAGE)
+	flag.PrintDefaults()
+	version()
+}
 
-	} else {
-		return empty, fmt.Errorf("flag requires a parameter")
-	}
+// Version shows program version
+func version() {
+	fmt.Fprintln(os.Stderr, "wordpuzzle version:", VERSION)
 }
 
 // check for error and print message and exit with non-zero error code
-func check(err error) {
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
+func check(e error) {
+	if e != nil {
+		fmt.Fprintf(os.Stderr, "unexpected error: %v\n", e)
 		os.Exit(1)
 	}
 }
 
+// GetMandatory returns leading lowercase byte from the argument string
+func GetMandatory(s string) (byte, error) {
+	var empty byte
+	if len(s) == 1 {
+		if m := rune(s[0]); unicode.IsLower(m) {
+			return byte(m), nil
+		}
+		return empty, fmt.Errorf("expected lowercase letter got %s", s)
+	}
+	return empty, fmt.Errorf("%s is invalid for mandatory character", s)
+}
+
 // RemoveIndex removes value by index from a byte array
-func RemoveIndex(s []byte, index int) []byte {
-	return append(s[:index], s[index+1:]...)
+func RemoveIndex(s []byte, i int) []byte {
+	return append(s[:i], s[i+1:]...)
 }
 
 // IsValidWord returns true if dictionary word is valid
@@ -66,24 +82,25 @@ func IsValidWord(size int, mandatory byte, letters string, word string) bool {
 // main process commandline arguments and filter valid words from dictionary
 func main() {
 
-	dictionary := flag.String("dictionary", "dictionary", "Dictionary to read words from")
+	dictionaryPath := flag.String("dictionary", "dictionary", "Dictionary to read words from")
 	letters := flag.String("letters", "", "Nine letters to make words")
 	mandatoryString := flag.String("mandatory", "", "Mandatory character for all words")
 	size := flag.Int("size", 4, "Minimum word size (value from 1..9)")
-	verbose := flag.Bool("verbose", false, "Verbose mode")
-	version := flag.Bool("version", false, "print wordpuzzle version")
+	verboseFlag := flag.Bool("verbose", false, "Verbose mode")
+	versionFlag := flag.Bool("version", false, "print wordpuzzle version")
+	flag.Usage = usage
 
 	flag.Parse()
 
 	// print version then exit
-	if *version {
-		fmt.Println("Version:", VERSION)
+	if *versionFlag {
+		version()
 		os.Exit(0)
 	}
 
 	// test mandatory parameters
 	if *size < 1 || *size > 9 || *mandatoryString == "" || *letters == "" {
-		flag.PrintDefaults()
+		usage()
 		os.Exit(1)
 	}
 
@@ -92,13 +109,13 @@ func main() {
 	check(ok)
 
 	// open dictionary
-	file, ok := os.Open(*dictionary)
+	file, ok := os.Open(*dictionaryPath)
 	check(ok)
 	defer file.Close()
 
 	// if verbose show all parameters
-	if *verbose {
-		fmt.Println("dictionary:", *dictionary)
+	if *verboseFlag {
+		fmt.Println("dictionary:", *dictionaryPath)
 		fmt.Println("letters:", *letters)
 		fmt.Println("mandatory:", mandatory)
 		fmt.Println("size:", *size)
