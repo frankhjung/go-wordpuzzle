@@ -70,11 +70,13 @@ func main() {
 
 	flag.Parse()
 
+	// print version then exit
 	if *version {
 		fmt.Println("Version:", VERSION)
 		os.Exit(0)
 	}
 
+	// test mandatory parameters
 	if *size < 1 || *size > 9 || *mandatoryString == "" || *letters == "" {
 		flag.PrintDefaults()
 		os.Exit(1)
