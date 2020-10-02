@@ -12,13 +12,18 @@ import (
 
 const VERSION = "1.0.0"
 
-// getMandatory returns mandatory byte from command line argument string
-func getMandatory(in string) (byte, error) {
+// GetMandatory returns mandatory byte from command line argument string
+func GetMandatory(in string) (byte, error) {
 	var empty byte
-	if m := ([]rune(in))[0]; unicode.IsLetter(m) && unicode.IsLower(m) {
-		return byte(m), nil
+	if len(in) > 0 {
+		if m := rune(in[0]); unicode.IsLetter(m) && unicode.IsLower(m) {
+			return byte(m), nil
+		}
+		return empty, fmt.Errorf("expected lowercase letter got %s", in)
+
+	} else {
+		return empty, fmt.Errorf("flag requires a parameter")
 	}
-	return empty, fmt.Errorf("expected lowercase letter got %s", in)
 }
 
 // check for error and print message and exit with non-zero error code
@@ -29,8 +34,8 @@ func check(err error) {
 	}
 }
 
-// removeIndex removes value by index from a byte array
-func removeIndex(s []byte, index int) []byte {
+// RemoveIndex removes value by index from a byte array
+func RemoveIndex(s []byte, index int) []byte {
 	return append(s[:index], s[index+1:]...)
 }
 
@@ -49,7 +54,7 @@ func IsValidWord(size int, mandatory byte, letters string, word string) bool {
 	for _, letter := range word {
 		if i := bytes.IndexByte(working, byte(letter)); i > -1 {
 			// remove from working list if present
-			working = removeIndex(working, i)
+			working = RemoveIndex(working, i)
 		} else {
 			// letter not in working list so not a valid word
 			return false
@@ -83,7 +88,7 @@ func main() {
 	}
 
 	// mandatory should be a lower case letter
-	mandatory, ok := getMandatory(*mandatoryString)
+	mandatory, ok := GetMandatory(*mandatoryString)
 	check(ok)
 
 	// open dictionary

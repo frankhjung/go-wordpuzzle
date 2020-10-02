@@ -37,3 +37,33 @@ func TestNotValidWord(t *testing.T) {
 		t.Errorf("Valid word %s. Expected true", word)
 	}
 }
+
+func TestRemoveIndex(t *testing.T) {
+	word := []byte("abc")
+	if result := RemoveIndex(word, 0); string(result) != "bc" {
+		t.Errorf("RemoveIndex from %s. Expected 'bc' got %s", word, result)
+	}
+}
+
+func TestGetMandatory(t *testing.T) {
+	parameter := "cd"
+	mandatory, ok := GetMandatory(parameter)
+	if ok != nil {
+		t.Errorf("Unexpected error: %t", ok)
+	}
+	if mandatory != 'c' {
+		t.Errorf("Expected 'c' got %c", mandatory)
+	}
+}
+
+func TestGetMandatoryEmpty(t *testing.T) {
+	var parameter string
+	var empty byte
+	mandatory, ok := GetMandatory(parameter)
+	if ok == nil {
+		t.Errorf("Expected error: got %v and %c", ok, mandatory)
+	}
+	if mandatory != empty {
+		t.Errorf("Expected '%c': got '%c'", empty, mandatory)
+	}
+}
