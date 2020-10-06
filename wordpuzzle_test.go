@@ -51,7 +51,7 @@ func TestLettersValid(t *testing.T) {
 		t.Errorf("Valid letters %s. Expected true", test)
 	}
 }
-func TestLettersInValid(t *testing.T) {
+func TestLettersInvalid(t *testing.T) {
 	test := "adevcrSoi"
 	if IsValidLetters(test) {
 		t.Errorf("Invalid letters %s. Expected false", test)
@@ -64,9 +64,9 @@ func TestLettersTooLong(t *testing.T) {
 	}
 }
 
-func TestGetMandatory(t *testing.T) {
+func TestIsValidMandatoryGood(t *testing.T) {
 	test := "c"
-	mandatory, ok := GetMandatory(test)
+	mandatory, ok := IsValidMandatory(test)
 	if ok != nil {
 		t.Errorf("Unexpected error: %t", ok)
 	}
@@ -75,9 +75,9 @@ func TestGetMandatory(t *testing.T) {
 	}
 }
 
-func TestGetMandatoryInvalid(t *testing.T) {
+func TestIsValidyMandatoryBad(t *testing.T) {
 	test := "xx"
-	mandatory, ok := GetMandatory(test)
+	mandatory, ok := IsValidMandatory(test)
 	if ok == nil {
 		t.Errorf("Expected error: got %v and %c", ok, mandatory)
 	}
@@ -86,9 +86,9 @@ func TestGetMandatoryInvalid(t *testing.T) {
 	}
 }
 
-func TestGetMandatoryNotLetter(t *testing.T) {
+func TestIsValidyMandatoryNotLetter(t *testing.T) {
 	test := "$"
-	mandatory, ok := GetMandatory(test)
+	mandatory, ok := IsValidMandatory(test)
 	if ok == nil {
 		t.Errorf("Expected error: got %v and %c", ok, mandatory)
 	}
@@ -96,9 +96,9 @@ func TestGetMandatoryNotLetter(t *testing.T) {
 		t.Errorf("Expected '' got %c", mandatory)
 	}
 }
-func TestGetMandatoryEmpty(t *testing.T) {
+func TestIsValidyMandatoryEmpty(t *testing.T) {
 	test := ""
-	mandatory, ok := GetMandatory(test)
+	mandatory, ok := IsValidMandatory(test)
 	if ok == nil {
 		t.Errorf("Expected error: got %v and %c", ok, mandatory)
 	}

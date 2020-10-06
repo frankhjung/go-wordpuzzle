@@ -1,3 +1,4 @@
+// WordPuzzle example application to solve the nine-letter word puzzle.
 package main
 
 import (
@@ -51,8 +52,8 @@ func IsValidLetters(s string) bool {
 	return true
 }
 
-// GetMandatory returns leading lowercase byte from the argument string
-func GetMandatory(s string) (byte, error) {
+// IsValidMandatory returns leading lowercase byte from the argument string
+func IsValidMandatory(s string) (byte, error) {
 	if len(s) == 1 {
 		if m := rune(s[0]); unicode.IsLower(m) {
 			return byte(m), nil
@@ -124,7 +125,7 @@ func main() {
 	}
 
 	// test required parameter mandatory
-	mandatory, ok := GetMandatory(*mandatoryChar)
+	mandatory, ok := IsValidMandatory(*mandatoryChar)
 	if ok != nil {
 		fmt.Fprintf(os.Stderr, "Error: invalid mandatory %s\n", *mandatoryChar)
 		usage()
